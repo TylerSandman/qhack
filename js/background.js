@@ -8,6 +8,7 @@ var myoID = -1;
 
 //Global booleans for the state of the Myo
 var unlocked = false;
+chrome.browserAction.setIcon({path : "img/locked.png"});
 var resting = true;
 
 //Timestamp of the last unlocked gesture
@@ -38,6 +39,7 @@ s.onmessage = function (e) {
 	if (unlocked && resting && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > restLockSeconds){
 		console.log("Locking!");
 		unlocked = false;
+		chrome.browserAction.setIcon({path : "img/locked.png"});
 		requestVibrate();
 	}
 
