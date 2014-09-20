@@ -34,6 +34,8 @@ s.onmessage = function (e) {
 	var json = JSON.parse(e.data);
 	var data = json[1];
 	var armUsed;
+	var lastOpenTab;
+	var tabStack = new Array();
 	
 	console.log(parseInt(data.timestamp - lastGestureTimeStamp) / 1000000);
 	if (unlocked && resting && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > restLockSeconds){
@@ -142,16 +144,20 @@ function onFist(data){
 		for (var j = 0; j < tabs.length; ++j){
 			if (tabs[j].active && tabs[j].title.search(bgPattern) === -1){
 				idToClose = tabs[j].id;
+				lastOpenTab = tabs[j];
 			}
 		}
 		chrome.tabs.remove(idToClose);
+		tabStack.push(lastOpenTab);
 	});
 	resting = false;
 }
 
 function onFingersSpread(data){
 	chrome.windows.getLastFocused({populate: true}, function(window){
-		chrome.tabs.create({windowId: window.id, active: true});
+		var tabToOpen = tabStack.pop();
+		chrome.tabs.create({windowId: window.id, url: tabToOpen.url});
+		//chrome.tabs.create({windowId: window.id, active: true});
 	});
 	resting = false;
 }
