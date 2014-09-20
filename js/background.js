@@ -33,8 +33,8 @@ s.onmessage = function (e) {
 	var json = JSON.parse(e.data);
 	var data = json[1];
 	var armUsed;
-	
-	console.log(parseInt(data.timestamp - lastGestureTimeStamp) / 1000000);
+
+	//console.log(parseInt(data.timestamp - lastGestureTimeStamp) / 1000000);
 	if (unlocked && resting && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > restLockSeconds){
 		console.log("Locking!");
 		unlocked = false;
@@ -43,22 +43,23 @@ s.onmessage = function (e) {
 
 	if (data.type === "arm_recognized"){
 		armUsed = data.arm;
+		console.log(armUsed);
 	}
-	
+
 	if (data.type !== "orientation"){
 		console.log(e.data);
 	}
-	
+
 	if (data.type === "pose" && myoID != -1){
-	
+
 		if (data.pose === "rest"){
 			onRest(data);
 		}
 		else if (data.pose === "thumb_to_pinky"){
 			onThumbToPinky(data);
 		}
-		
-		else if (unlocked){
+
+		else if (unlocked || true){
 			lastGestureTimeStamp = parseInt(data.timestamp);
 			if (data.pose === "wave_in"){
 				if (armUsed === "left"){
@@ -68,7 +69,7 @@ s.onmessage = function (e) {
 					onWaveIn(data);
 				}
 			}
-				
+
 			else if (data.pose === "wave_out")
 				if (armUsed === "left"){
 					onWaveIn(data);
@@ -82,7 +83,7 @@ s.onmessage = function (e) {
 				onFingersSpread(data);
 		}
 	}
-	
+
 	if (data.type === "connected"){
 		myoID = data.myo;
 	}
@@ -106,7 +107,10 @@ function onThumbToPinky(data){
 }
 
 function onWaveIn(data){
-	chrome.windows.getLastFocused({populate: true}, function(window){
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+	    chrome.tabs.sendMessage(tabs[0].id, {action: "scrollDown"}, function(response) {console.log(response.status)});
+	});
+/*	chrome.windows.getLastFocused({populate: true}, function(window){
 		var tabs = window.tabs;
 		var selectedIndex;
 		for (var i = 0; i < tabs.length; ++i){
@@ -115,11 +119,15 @@ function onWaveIn(data){
 			}
 		}
 		chrome.tabs.highlight({windowId: window.id, tabs: (selectedIndex === 0) ? tabs.length - 1 : selectedIndex - 1}, function(window){});
-	});
+	});*/
 	resting = false;
 }
 
 function onWaveOut(data){
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+	    chrome.tabs.sendMessage(tabs[0].id, {action: "scrollUp"}, function(response) {console.log(response.status)});
+	});
+/*
 	chrome.windows.getLastFocused({populate: true}, function(window){
 		var tabs = window.tabs;
 		var selectedIndex;
@@ -129,7 +137,7 @@ function onWaveOut(data){
 			}
 		}
 		chrome.tabs.highlight({windowId: window.id, tabs: (selectedIndex === tabs.length - 1) ? 0 : selectedIndex + 1}, function(window){});
-	});
+	});*/
 	resting = false;
 }
 
