@@ -4,23 +4,16 @@
 </body>
 <script>
     var host = "ws://localhost:7024/myo/1";
-    console.log(idMsg);
     console.log("Host:", host);
     
     var s = new WebSocket(host);
     
     s.onopen = function (e) {
         console.log("Socket opened.");
-        $('.alert').hide();
-        $('.alert-warning').show();
-        s.send(idMsg);
     };
     
     s.onclose = function (e) {
         console.log("Socket closed.");
-        $('.alert').hide();
-        $('.alert-danger').show();
-        s.send("{\"T\":1}");
     };
     
     s.onmessage = function (e) {
