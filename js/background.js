@@ -33,13 +33,13 @@ s.onmessage = function (e) {
 	var json = JSON.parse(e.data);
 	var data = json[1];
 	var armUsed;
-/*
+
 	//console.log(parseInt(data.timestamp - lastGestureTimeStamp) / 1000000);
 	if (unlocked && resting && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > restLockSeconds){
 		console.log("Locking!");
 		unlocked = false;
 		requestVibrate();
-	}*/
+	}
 
 	if (data.type === "arm_recognized"){
 		armUsed = data.arm;
