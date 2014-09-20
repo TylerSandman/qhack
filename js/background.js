@@ -6,9 +6,15 @@ var bgPattern = /Developer Tools - chrome-extension/;
 
 var myoID = -1;
 
+//Global booleans for the state of the Myo
 var unlocked = false;
 var resting = true;
+
+//Timestamp of the last unlocked gesture
 var lastGestureTimeStamp = 0;
+
+//How many seconds to wait after a gesture before locking the myo again
+var restLockSeconds = 3;
 
 console.log("Host:", host);
 
@@ -28,7 +34,7 @@ s.onmessage = function (e) {
 	var data = json[1];
 	
 	console.log(parseInt(data.timestamp - lastGestureTimeStamp) / 1000000);
-	if (unlocked && resting && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > 3){
+	if (unlocked && resting && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > restLockSeconds){
 		console.log("Locking!");
 		unlocked = false;
 		requestVibrate();
