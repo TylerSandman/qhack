@@ -96,11 +96,11 @@ function onThumbToPinky(data){
 	if (!unlocked){
 		lastGestureTimeStamp = parseInt(data.timestamp);
 		unlocked = true;
-		chrome.browserAction.setIcon("img/unlocked.png");
+		chrome.browserAction.setIcon({path : "img/unlocked.png"});
 	}
 	else{
 		unlocked = false;
-		chrome.browserAction.setIcon("img/locked.png");
+		chrome.browserAction.setIcon({path : "img/locked.png"});
 	}
 	requestVibrate();
 }
