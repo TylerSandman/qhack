@@ -17,6 +17,29 @@ var lastGestureTimeStamp = 0;
 //How many seconds to wait after a gesture before locking the myo again
 var restLockSeconds = 3;
 
+
+var scrollPx;
+var lockTime;
+var delayTime;
+var oneScreen;
+
+// Setting page stuff
+  chrome.storage.onChanged.addListener(function(changes, namespace) {
+    for (key in changes) {
+        if (key == "scrollPx") {
+            scrollPx = changes[key];
+        }
+        else if (key == "lockTime") {
+            lockTime = changes[key];
+        }
+        else if (key == "delayTime") {
+            delayTime = changes[key];
+        }
+        else if (key == "oneScreen") {
+            oneScreen = changes[key];
+        }
+    }
+  });
 console.log("Host:", host);
 
 var s = new WebSocket(host);
