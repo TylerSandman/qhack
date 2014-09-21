@@ -21,6 +21,10 @@ ModeManager.prototype = {
 			this.mode = new TabBrowserMode(this);
 		}
 		else if (this.mode.getModeName() === "Tab"){
+			this.mode = new WindowBrowserMode(this);
+		}
+		
+		else if (this.mode.getModeName() === "Window"){
 			this.mode = new LockedBrowserMode(this);
 		}
 	},
@@ -64,7 +68,7 @@ LockedBrowserMode.prototype = {
 
 	/* Unlock gesture */
 	onThumbToPinky : function(data){
-		chrome.browserAction.setIcon({path : "img/unlocked.png"});		
+		chrome.browserAction.setIcon({path : "img/tabsMode.png"});		
 		this.manager.nextMode();
 	},
 	
@@ -86,7 +90,7 @@ TabBrowserMode.prototype = {
 
 	/* Mode change gesture */
 	onThumbToPinky : function(data){
-		chrome.browserAction.setIcon({path : "img/locked.png"});
+		chrome.browserAction.setIcon({path : "img/windowsMode.png"});
 		this.manager.nextMode();
 	},
 	
@@ -146,4 +150,76 @@ TabBrowserMode.prototype = {
 	onRest : function(){ this.resting = true; },
 	
 	getModeName : function(){ return "Tab"; }
+}
+
+/* Window Browser Mode */
+WindowBrowserMode = function(manager){
+	WindowBrowserMode.baseConstructor.call(this, manager);
+}
+InheritanceManager.extend(WindowBrowserMode, BrowserMode);
+
+WindowBrowserMode.prototype = {
+
+	/* Mode change gesture */
+	onThumbToPinky : function(data){
+		chrome.browserAction.setIcon({path : "img/locked.png"});
+		this.manager.nextMode();
+	},
+	
+	/* Window change gesture */
+	onWaveIn : function(data){
+		chrome.windows.getAll({populate: false}, function(windows){
+			var selectedIndex;
+			for (var i = 0; windows.length; ++i){
+				if (windows[i].active && windows[i].title.search(bgPattern === -1)){
+					selectedIndex = i;
+					break;
+				}
+			}
+			selectedIndex = (selectedIndex == 0) ? windows.length - 1 : selectedIndex - 1;
+			var focusId = windows[selectedIndex].id;
+			chrome.windows.update(focusId, {focused : true}, function(window){});
+		})
+		this.resting = false;
+	},
+	
+	/* Window change gesture */
+	onWaveOut : function(data){
+		chrome.windows.getAll({populate: false}, function(windows){
+			var selectedIndex;
+			for (var i = 0; windows.length; ++i){
+				if (windows[i].active && windows[i].title.search(bgPattern === -1)){
+					selectedIndex = i;
+					break;
+				}
+			}
+			selectedIndex = (selectedIndex == (windows.length - 1)) ? 0 : selectedIndex + 1;
+			var focusId = windows[selectedIndex].id;
+			chrome.windows.update(focusId, {focused : true}, function(window){});
+		})
+		this.resting = false;
+	},
+	
+	/* Window close gesture */
+	onFist : function(data){
+		var idToClose = -1;
+		chrome.windows.getLastFocused({populate: true}, function(window){
+			idToClose = window.id
+		});
+		chrome.windows.remove(idToClose, function(){});
+		this.resting = false;
+	},
+	
+	/* Window open gesture */
+	onFingersSpread : function(data){
+		var focusId = -1;
+		chrome.windows.create({}, function(window){
+			focusId = window.id;
+		});
+		chrome.windows.update(focusId, {focused : true}, function(window{});
+	},
+	
+	onRest : function(){ this.resting = true; },
+	
+	getModeName : function(){ return "Window"; }
 }
