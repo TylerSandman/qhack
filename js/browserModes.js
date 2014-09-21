@@ -30,7 +30,7 @@ ModeManager.prototype = {
 	},
 	
 	onThumbToPinky : function(data){ this.mode.onThumbToPinky(data); },
-	onWaveIn : function(data){ this.mode.onThumbToPinky(data); },
+	onWaveIn : function(data){ this.mode.onWaveIn(data); },
 	onWaveOut : function(data){ this.mode.onWaveOut(data); },
 	onFist : function(data){ this.mode.onFist(data); },
 	onFingersSpread : function(data){ this.mode.onFingersSpread(data); },

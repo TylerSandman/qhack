@@ -5,6 +5,7 @@ var host = "ws://127.0.0.1:7204/myo/1";
 var bgPattern = /Developer Tools - chrome-extension/;
 
 var myoID = -1;
+var armUsed;
 
 //Timestamp of the last unlocked gesture
 var lastGestureTimeStamp = 0;
@@ -29,12 +30,14 @@ s.onmessage = function (e) {
 
 	var json = JSON.parse(e.data);
 	var data = json[1];
-	var armUsed;
+	var lastOpentab;
+	var tabStack = new Array();
 
 	//console.log(parseInt(data.timestamp - lastGestureTimeStamp) / 1000000);
 	if (manager.mode.resting && manager.mode.getModeName() !== "Locked" && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > restLockSeconds){
 		console.log("Locking!");
 		manager.changeMode(new LockedBrowserMode(manager));
+		chrome.browserAction.setIcon({path : "img/locked.png"});
 		requestVibrate();
 	}
 
@@ -48,7 +51,6 @@ s.onmessage = function (e) {
 	}
 
 	if (data.type === "pose" && myoID != -1){
-
 		
 		if (data.pose === "thumb_to_pinky"){
 			manager.onThumbToPinky(data);
@@ -58,9 +60,7 @@ s.onmessage = function (e) {
 			requestVibrate();
 		}
 		
-		else if (data.pose === "rest"){
-			manager.onRest(data);
-		}		
+			
 
 		else if (manager.mode.getModeName() !== "Locked"){
 			lastGestureTimeStamp = parseInt(data.timestamp);
@@ -85,6 +85,10 @@ s.onmessage = function (e) {
 			else if (data.pose === "fingers_spread")
 				manager.onFingersSpread(data);
 		}
+		
+		else if (data.pose === "rest"){
+			manager.onRest(data);
+		}	
 	}
 
 	if (data.type === "connected"){
