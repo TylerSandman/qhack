@@ -171,7 +171,7 @@ WindowBrowserMode.prototype = {
 		chrome.windows.getAll({populate: false}, function(windows){
 			var selectedIndex;
 			for (var i = 0; windows.length; ++i){
-				if (windows[i].active && windows[i].title.search(bgPattern === -1)){
+				if (windows[i].focused){
 					selectedIndex = i;
 					break;
 				}
@@ -188,7 +188,7 @@ WindowBrowserMode.prototype = {
 		chrome.windows.getAll({populate: false}, function(windows){
 			var selectedIndex;
 			for (var i = 0; windows.length; ++i){
-				if (windows[i].active && windows[i].title.search(bgPattern === -1)){
+				if (windows[i].focused){
 					selectedIndex = i;
 					break;
 				}
@@ -204,9 +204,9 @@ WindowBrowserMode.prototype = {
 	onFist : function(data){
 		var idToClose = -1;
 		chrome.windows.getLastFocused({populate: true}, function(window){
-			idToClose = window.id
+			idToClose = window.id;
+			chrome.windows.remove(idToClose, function(){});
 		});
-		chrome.windows.remove(idToClose, function(){});
 		this.resting = false;
 	},
 	
@@ -215,8 +215,8 @@ WindowBrowserMode.prototype = {
 		var focusId = -1;
 		chrome.windows.create({}, function(window){
 			focusId = window.id;
-		});
-		chrome.windows.update(focusId, {focused : true}, function(window{});
+			chrome.windows.update(focusId, {focused : true}, function(window){});
+		});	
 	},
 	
 	onRest : function(){ this.resting = true; },

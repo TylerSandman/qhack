@@ -8,7 +8,6 @@ var myoID = -1;
 var armUsed;
 
 //Global booleans for the state of the Myo
-chrome.browserAction.setIcon({path : "img/locked.png"});
 chrome.browserAction.setPopup({popup: ""});
 
 //Timestamp of the last unlocked gesture
@@ -57,10 +56,8 @@ s.onmessage = function (e) {
 
 	var json = JSON.parse(e.data);
 	var data = json[1];
-	var lastOpentab;
-	var tabStack = new Array();
 
-	//console.log(parseInt(data.timestamp - lastGestureTimeStamp) / 1000000);
+	console.log(parseInt(data.timestamp - lastGestureTimeStamp) / 1000000);
 	if (manager.mode.resting && manager.mode.getModeName() !== "Locked" && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > restLockSeconds){
 		console.log("Locking!");
 		manager.changeMode(new LockedBrowserMode(manager));
@@ -86,8 +83,6 @@ s.onmessage = function (e) {
 			}
 			requestVibrate();
 		}
-
-
 
 		else if (manager.mode.getModeName() !== "Locked"){
 			lastGestureTimeStamp = parseInt(data.timestamp);
