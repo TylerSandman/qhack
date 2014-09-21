@@ -8,7 +8,7 @@ var myoID = -1;
 var armUsed;
 
 //Global booleans for the state of the Myo
-chrome.browserAction.setIcon({path : "img/windowsMode_locked.png"});
+chrome.browserAction.setIcon({path : "img/locked.png"});
 chrome.browserAction.setPopup({popup: ""});
 
 //Timestamp of the last unlocked gesture
@@ -78,7 +78,7 @@ s.onmessage = function (e) {
 	}
 
 	if (data.type === "pose" && myoID != -1){
-		
+
 		if (data.pose === "thumb_to_pinky"){
 			manager.onThumbToPinky(data);
 			if (manager.mode.getModeName() !== "Locked"){
@@ -86,8 +86,8 @@ s.onmessage = function (e) {
 			}
 			requestVibrate();
 		}
-		
-			
+
+
 
 		else if (manager.mode.getModeName() !== "Locked"){
 			lastGestureTimeStamp = parseInt(data.timestamp);
@@ -112,10 +112,10 @@ s.onmessage = function (e) {
 			else if (data.pose === "fingers_spread")
 				manager.onFingersSpread(data);
 		}
-		
+
 		else if (data.pose === "rest"){
 			manager.onRest(data);
-		}	
+		}
 	}
 
 	if (data.type === "connected"){
