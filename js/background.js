@@ -13,9 +13,12 @@ chrome.browserAction.setPopup({popup: ""});
 //Timestamp of the last unlocked gesture
 var lastGestureTimeStamp = 0;
 
-var scrollPx;
 //How many seconds to wait after a gesture before locking the myo again
-var lockTime = 3;
+var lockTime = 3
+
+//If our accelerometer Z value is larger than this we will scroll
+var accThreshold = 1;
+
 var oneScreen;
 
 // Setting page stuff
@@ -137,7 +140,7 @@ s.onmessage = function (e) {
 	var data = json[1];
 
 	//console.log(parseInt(data.timestamp - lastGestureTimeStamp) / 1000000);
-	if (manager.mode.resting && manager.mode.getModeName() !== "Locked" && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > lockTime){
+	if (manager.mode.getModeName() !== "Locked" && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > lockTime){
 		console.log("Locking!");
 		manager.changeMode(new LockedBrowserMode(manager));
 		chrome.browserAction.setIcon({path : "img/locked.png"});
@@ -147,10 +150,6 @@ s.onmessage = function (e) {
 	if (data.type === "arm_recognized"){
 		armUsed = data.arm;
 		console.log(armUsed);
-	}
-
-	if (data.type !== "orientation"){
-		console.log(e.data);
 	}
 
 	if (data.type === "pose" && myoID != -1){

@@ -37,6 +37,8 @@ ModeManager.prototype = {
 	onThumbToPinky : function(data){ this.mode.onThumbToPinky(data); },
 	onWaveIn : function(data){ this.mode.onWaveIn(data); },
 	onWaveOut : function(data){ this.mode.onWaveOut(data); },
+	onWaveUp : function(data){ this.mode.onWaveUp(data); },
+	onWaveDown : function(data){ this.mode.onWaveDown(data); },
 	onFist : function(data){ this.mode.onFist(data); },
 	onFingersSpread : function(data){ this.mode.onFingersSpread(data); },
 	onRest : function(data){ this.mode.onRest(data); }
@@ -52,6 +54,8 @@ BrowserMode.prototype = {
 	onThumbToPinky : function(data){},
 	onWaveIn : function(data){},
 	onWaveOut : function(data){},
+	onWaveUp : function(data){},
+	onWaveDown : function(data){},
 	onFist : function(data){},
 	onFingersSpread : function(data){},
 	onRest : function(data){ this.resting = true; },
@@ -75,6 +79,8 @@ LockedBrowserMode.prototype = {
 	
 	onWaveIn : function(data){},
 	onWaveOut : function(data){},
+	onWaveUp : function(data){},
+	onWaveDown : function(data){},
 	onFist : function(data){},
 	onFingersSpread : function(data){},
 	onRest : function(){ this.resting = true; },
@@ -122,6 +128,20 @@ TabBrowserMode.prototype = {
 			}
 			chrome.tabs.highlight({windowId: window.id, tabs: (selectedIndex === tabs.length - 1) ? 0 : selectedIndex + 1}, function(window){});
 		})
+		this.resting = false;
+	},
+	
+	onWaveUp : function(data){
+		chrome.tabs.query({active: true, lastFocusedWindow: true}, function(tabs){
+			chrome.tabs.executeScript(tabs[0].id, {code: 'window.scrollBy(0, -150);'});
+		});
+		this.resting = false;
+	},
+	
+	onWaveDown : function(data){
+		chrome.tabs.query({active: true, lastFocusedWindow: true}, function(tabs){
+			chrome.tabs.executeScript(tabs[0].id, {code: 'window.scrollBy(0, 150);'});
+		});
 		this.resting = false;
 	},
 	
@@ -198,6 +218,20 @@ WindowBrowserMode.prototype = {
 			var focusId = windows[selectedIndex].id;
 			chrome.windows.update(focusId, {focused : true}, function(window){});
 		})
+		this.resting = false;
+	},
+	
+	onWaveUp : function(data){
+		chrome.tabs.query({active: true, lastFocusedWindow: true}, function(tabs){
+			chrome.tabs.executeScript(tabs[0].id, {code: 'window.scrollBy(0, -document.height / 10);'});
+		});
+		this.resting = false;
+	},
+	
+	onWaveDown : function(data){
+		chrome.tabs.query({active: true, lastFocusedWindow: true}, function(tabs){
+			chrome.tabs.executeScript(tabs[0].id, {code: 'window.scrollBy(0, document.height / 10);'});
+		});
 		this.resting = false;
 	},
 	

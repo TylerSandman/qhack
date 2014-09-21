@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
 
-  "name": "My Myo, Yo",
-  "description": "Yes.",
+  "name": "Chromyo",
+  "description": "Control your Chrome browser using the Thalmic Myo!",
   "version": "1.0",
 
   "permissions": [
@@ -16,7 +16,7 @@
   },
   "options_page": "config.html",
   "icons": {
-        "48": "img/default.png"
+        "48": "img/tabsMode.png"
   },
   "background": {
     "scripts": ["js/browserModes.js", "js/background.js"]
