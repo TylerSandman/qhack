@@ -17,7 +17,6 @@ var scrollPx;
 //How many seconds to wait after a gesture before locking the myo again
 var lockTime = 3;
 var oneScreen;
-var windowArray = new Array();
 
 // Setting page stuff
 chrome.storage.onChanged.addListener(function(changes, namespace) {
@@ -37,57 +36,90 @@ console.log("Host:", host);
 
 var s = new WebSocket(host);
 var manager = new ModeManager();
+manager.windowArray = [];
 
 //Window Array/Tab Stack
-chrome.browserAction.onCreated.addListener(function (window) {
+chrome.windows.onCreated.addListener(function (window) {
+	/*
 	//adds window.id to the array.
 	var closeStack = [];
 	var openStack = [];
-	windowArray.push({id:window.id, closeTabStack: closeStack, openTabStack: openStack});
+	manager.windowArray.push({id:window.id, closeTabStack: closeStack, openTabStack: openStack});
+	*/
 });
 
-chrome.browserAction.onRemoved.addListener(function (windowID) {
-	for (var i = 0; i < windowArray.length; i++){
-		if (windowArray[i].id === windowID){
-			windowArray.splice(i-1, 1);
+chrome.windows.onRemoved.addListener(function (windowID) {
+	/*
+	for (var i = 0; i < manager.windowArray.length; i++){
+		if (manager.windowArray[i].id === windowID){
+			manager.windowArray.splice(i-1, 1);
 			break;
 		}
 	}
+	*/
 });
 
-getCurrentWindowArrayElement = function () {
-	var currentWindowArrayElement;
-
+//WiP tab stacks
+chrome.tabs.onCreated.addListener(function (tab) {
+	/*
 	chrome.windows.getLastFocused({populate: true}, function(window){
 		var windowID = window.id;
-	}
-
-	for (var i = 0; i < windowArray.length; i++){
-		if (windowArray[i].id === windowID){
-			currentWindowArrayElement = windowArray[i];
-			break;
+		for (var i = 0; i < manager.windowArray.length; i++){
+			if (manager.windowArray[i].id === windowID){
+				manager.windowArray[i].openTabStack.push(tab);
+				break;
+			}
 		}
-	}
-};
+	});
+	*/
+});
 
-chrome.tabs.onCreated.addListener(function (tab) {
-	currentWindowArrayElement = getCurrentWindowArrayElement();
+//WiP tab stacks
+chrome.tabs.onUpdated.addListener(function(tabID, changeInfo, tab){
 
-	currentWindowArrayElement.openStack.push(tab);
-})
+	/*
+	chrome.windows.getLastFocused({populate: true}, function(window){
+		var windowID = window.id;
+		var currentWindowArrayElement;
+		var changeEle;
+		for (var i = 0; i < manager.windowArray.length; i++){
+			if (manager.windowArray[i].id === windowID){
+				currentWindowArrayElement = manager.windowArray[i];
+				changeEle = i;
+				break;
+			}
+		}
+		for (var i = 0; i < currentWindowArrayElement.openTabStack.length; i++){
+			if (currentWindowArrayElement.openTabStack[i].id === tabID){
+				manager.windowArray[changeEle].openTabStack[i].url = changeInfo.url;
+				return;
+			}
+		}
+	});
+	*/
+});
 
+//WiP tab stacks
 chrome.tabs.onRemoved.addListener(function (tabID) {
-	var currentWindowArrayElement = getCurrentWindowArrayElement();
-	var lastOpenedTab;
-
-	for (var i = 0; i < currentWindowArrayElement.openTabStack.length; i++){
-		if (currentWindowArrayElement.openTabStack[i].id === tabID){
-			lastOpenedTab = currentWindowArrayElement.openTabStack[i];
-			break;
+	/*
+	chrome.windows.getLastFocused({populate: true}, function(window){
+		var windowID = window.id;
+		var currentWindowArrayElement;
+		for (var i = 0; i < manager.windowArray.length; i++){
+			if (manager.windowArray[i].id === windowID){
+				currentWindowArrayElement = manager.windowArray[i];
+				break;
+			}
 		}
-	}
-
-	currentWindowArrayElement.closeTabStack.push(lastOpenedTab);
+		for (var i = 0; i < currentWindowArrayElement.openTabStack.length; i++){
+			if (currentWindowArrayElement.openTabStack[i].id === tabID){
+				lastOpenedTab = currentWindowArrayElement.openTabStack[i];
+				currentWindowArrayElement.closeTabStack.push(lastOpenedTab);
+				return;
+			}
+		}
+	});
+	*/
 });
 
 

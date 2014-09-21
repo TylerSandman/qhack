@@ -141,16 +141,9 @@ TabBrowserMode.prototype = {
 	},
 	
 	/* Tab open gesture */
-	onFingersSpread : function(data){
-		var lastClosedTab;
+	onFingersSpread : function(data){	
 		chrome.windows.getLastFocused({populate: true}, function(window){
-			for (var i = 0; i < this.manager.windowArray; i++){
-				if (window.id === windowArray[i].id){
-					lastClosedTab = windowArray[i].closeTabStack.pop();
-				}
-			}
-
-			chrome.tabs.create({windowId: window.id, active: true, url: lastClosedTab.url});
+			chrome.tabs.create({windowId: window.id, active: true});
 		});
 		this.resting = false;
 	},
