@@ -14,7 +14,10 @@
    id="svg2997"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   sodipodi:docname="New document 2">
+   sodipodi:docname="default.svg"
+   inkscape:export-filename="/Users/amandavaloppi/qhack/img/wip/default.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs2999" />
   <sodipodi:namedview
@@ -25,7 +28,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.197802"
-     inkscape:cx="13.409715"
+     inkscape:cx="11.249868"
      inkscape:cy="16"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -54,7 +57,7 @@
      inkscape:groupmode="layer">
     <path
        sodipodi:type="arc"
-       style="fill:#279dd8;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#00bbde;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="path3777"
        sodipodi:cx="16.56575"
        sodipodi:cy="20.345926"
