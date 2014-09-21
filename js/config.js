@@ -16,7 +16,7 @@ function save_options() {
       setTimeout(function () {
         saveText.className = "";
         saveText.style.display = "none";
-      }, 1505);
+      }, 3000);
   });
 }
 
