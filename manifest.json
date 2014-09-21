@@ -20,12 +20,12 @@
   },
   "options_page": "config.html",
   "background": {
-    "scripts": ["js/background.js"]
+    "scripts": ["js/browserModes.js", "js/background.js"]
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["js/foreground.js"]
+      "js": ["js/browserModes.js", "js/foreground.js"]
     }
   ]
 }

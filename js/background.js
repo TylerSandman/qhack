@@ -6,10 +6,6 @@ var bgPattern = /Developer Tools - chrome-extension/;
 
 var myoID = -1;
 
-//Global booleans for the state of the Myo
-var unlocked = false;
-var resting = true;
-
 //Timestamp of the last unlocked gesture
 var lastGestureTimeStamp = 0;
 
@@ -19,6 +15,7 @@ var restLockSeconds = 3;
 console.log("Host:", host);
 
 var s = new WebSocket(host);
+var manager = new ModeManager();
 
 s.onopen = function (e) {
 	console.log("Socket opened.");
@@ -35,9 +32,9 @@ s.onmessage = function (e) {
 	var armUsed;
 
 	//console.log(parseInt(data.timestamp - lastGestureTimeStamp) / 1000000);
-	if (unlocked && resting && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > restLockSeconds){
+	if (manager.mode.resting && manager.mode.getModeName() !== "Locked" && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > restLockSeconds){
 		console.log("Locking!");
-		unlocked = false;
+		manager.changeMode(new LockedBrowserMode(manager));
 		requestVibrate();
 	}
 
@@ -52,35 +49,41 @@ s.onmessage = function (e) {
 
 	if (data.type === "pose" && myoID != -1){
 
-		if (data.pose === "rest"){
-			onRest(data);
+		
+		if (data.pose === "thumb_to_pinky"){
+			manager.onThumbToPinky(data);
+			if (manager.mode.getModeName() !== "Locked"){
+				lastGestureTimeStamp = parseInt(data.timestamp);
+			}
+			requestVibrate();
 		}
-		else if (data.pose === "thumb_to_pinky"){
-			onThumbToPinky(data);
-		}
+		
+		else if (data.pose === "rest"){
+			manager.onRest(data);
+		}		
 
-		else if (unlocked || true){
+		else if (manager.mode.getModeName() !== "Locked"){
 			lastGestureTimeStamp = parseInt(data.timestamp);
 			if (data.pose === "wave_in"){
 				if (armUsed === "left"){
-					onWaveOut(data);
+					manager.onWaveOut(data);
 				}
 				else {
-					onWaveIn(data);
+					manager.onWaveIn(data);
 				}
 			}
 
 			else if (data.pose === "wave_out")
 				if (armUsed === "left"){
-					onWaveIn(data);
+					manager.onWaveIn(data);
 				}
 				else {
-					onWaveOut(data);
+					manager.onWaveOut(data);
 				}
 			else if (data.pose === "fist")
-				onFist(data);
+				manager.onFist(data);
 			else if (data.pose === "fingers_spread")
-				onFingersSpread(data);
+				manager.onFingersSpread(data);
 		}
 	}
 
@@ -92,79 +95,6 @@ s.onmessage = function (e) {
 s.onerror = function (e) {
 	console.log("Socket error:", e);
 };
-
-function onThumbToPinky(data){
-	if (!unlocked){
-		lastGestureTimeStamp = parseInt(data.timestamp);
-		unlocked = true;
-		chrome.browserAction.setIcon({path : "img/unlocked.png"});
-	}
-	else{
-		unlocked = false;
-		chrome.browserAction.setIcon({path : "img/locked.png"});
-	}
-	requestVibrate();
-}
-
-function onWaveIn(data){
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-	    chrome.tabs.sendMessage(tabs[0].id, {action: "scrollDown"}, function(response) {console.log(response.status)});
-	});
-/*	chrome.windows.getLastFocused({populate: true}, function(window){
-		var tabs = window.tabs;
-		var selectedIndex;
-		for (var i = 0; i < tabs.length; ++i){
-		    if (tabs[i].active && tabs[i].title.search(bgPattern === -1)){
-			    selectedIndex = i;
-			}
-		}
-		chrome.tabs.highlight({windowId: window.id, tabs: (selectedIndex === 0) ? tabs.length - 1 : selectedIndex - 1}, function(window){});
-	});*/
-	resting = false;
-}
-
-function onWaveOut(data){
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-	    chrome.tabs.sendMessage(tabs[0].id, {action: "scrollUp"}, function(response) {console.log(response.status)});
-	});
-/*
-	chrome.windows.getLastFocused({populate: true}, function(window){
-		var tabs = window.tabs;
-		var selectedIndex;
-		for (var i = 0; i < tabs.length; ++i){
-		    if (tabs[i].active && tabs[i].title.search(bgPattern === -1)){
-			    selectedIndex = i;
-			}
-		}
-		chrome.tabs.highlight({windowId: window.id, tabs: (selectedIndex === tabs.length - 1) ? 0 : selectedIndex + 1}, function(window){});
-	});*/
-	resting = false;
-}
-
-function onFist(data){
-	var idToClose = -1;
-	chrome.windows.getLastFocused({populate: true}, function(window){
-		var tabs = window.tabs;
-		for (var j = 0; j < tabs.length; ++j){
-			if (tabs[j].active && tabs[j].title.search(bgPattern) === -1){
-				idToClose = tabs[j].id;
-			}
-		}
-		chrome.tabs.remove(idToClose);
-	});
-	resting = false;
-}
-
-function onFingersSpread(data){
-	chrome.windows.getLastFocused({populate: true}, function(window){
-		chrome.tabs.create({windowId: window.id, active: true});
-	});
-	resting = false;
-}
-
-function onRest(data){
-    resting = true;
-}
 
 function requestVibrate(){
 	var data = [
