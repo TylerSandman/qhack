@@ -3,7 +3,7 @@
 
   "name": "Chromyo",
   "description": "Control your Chrome browser using the Thalmic Myo!",
-  "version": "1.0",
+  "version": "0.7.3",
 
   "permissions": [
     "<all_urls>",
