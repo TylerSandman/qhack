@@ -16,7 +16,7 @@
   },
   "options_page": "config.html",
   "icons": {
-        "48": "img/tabsMode.png"
+        "48": "img/logo.png"
   },
   "background": {
     "scripts": ["js/browserModes.js", "js/background.js"]

@@ -14,26 +14,11 @@ chrome.browserAction.setPopup({popup: ""});
 var lastGestureTimeStamp = 0;
 
 //How many seconds to wait after a gesture before locking the myo again
-var lockTime = 3
-
-//If our accelerometer Z value is larger than this we will scroll
-var accThreshold = 1;
-
-var oneScreen;
+var lockTime = 3;
 
 // Setting page stuff
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-	for (key in changes) {
-	    if (key == "scrollPx") {
-	        scrollPx = changes[key];
-	    }
-	    else if (key == "lockTime") {
-	        lockTime = changes[key];
-	    }
-	    else if (key == "oneScreen") {
-	        oneScreen = changes[key];
-	    }
-	}
+chrome.storage.sync.get('lockTime', function(val){
+	lockTime = parseInt(val.lockTime);
 });
 console.log("Host:", host);
 
@@ -149,10 +134,11 @@ s.onmessage = function (e) {
 
 	if (data.type === "arm_recognized"){
 		armUsed = data.arm;
-		console.log(armUsed);
 	}
 
 	if (data.type === "pose" && myoID != -1){
+	
+		console.log(data);
 
 		if (data.pose === "thumb_to_pinky"){
 			manager.onThumbToPinky(data);
