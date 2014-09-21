@@ -15,6 +15,7 @@
     "default_icon": "img/locked.png",
     "default_popup": "popup.html"
   },
+  "options_page": "config.html",
   "icons": {
       "48": "img/default.png"
   },

@@ -7,6 +7,10 @@ var bgPattern = /Developer Tools - chrome-extension/;
 var myoID = -1;
 var armUsed;
 
+//Global booleans for the state of the Myo
+chrome.browserAction.setIcon({path : "img/windowsMode_locked.png"});
+chrome.browserAction.setPopup({popup: ""});
+
 //Timestamp of the last unlocked gesture
 var lastGestureTimeStamp = 0;
 
