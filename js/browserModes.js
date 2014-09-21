@@ -11,6 +11,7 @@ InheritanceManager.extend = function (subClass, baseClass) {
 
 ModeManager = function(){
 	this.mode = new LockedBrowserMode(this);
+	this.windowArray = new Array();
 }
 
 ModeManager.prototype = {
@@ -137,8 +138,15 @@ TabBrowserMode.prototype = {
 	
 	/* Tab open gesture */
 	onFingersSpread : function(data){
+		var lastClosedTab;
 		chrome.windows.getLastFocused({populate: true}, function(window){
-			chrome.tabs.create({windowId: window.id, active: true});
+			for (var i = 0; i < this.manager.windowArray; i++){
+				if (window.id === windowArray[i].id){
+					lastClosedTab = windowArray[i].closeTabStack.pop();
+				}
+			}
+
+			chrome.tabs.create({windowId: window.id, active: true, url: lastClosedTab.url});
 		});
 		this.resting = false;
 	},

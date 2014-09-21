@@ -22,6 +22,7 @@ var scrollPx;
 var lockTime;
 var delayTime;
 var oneScreen;
+var windowArray = new Array();
 
 // Setting page stuff
   chrome.storage.onChanged.addListener(function(changes, namespace) {
@@ -45,6 +46,59 @@ console.log("Host:", host);
 var s = new WebSocket(host);
 var manager = new ModeManager();
 
+//Window Array/Tab Stack
+chrome.browserAction.onCreated.addListener(function (window) {
+	//adds window.id to the array.
+	var closeStack = [];
+	var openStack = [];
+	windowArray.push({id:window.id, closeTabStack: closeStack, openTabStack: openStack});
+});
+
+chrome.browserAction.onRemoved.addListener(function (windowID) {
+	for (var i = 0; i < windowArray.length; i++){
+		if (windowArray[i].id === windowID){
+			windowArray.splice(i-1, 1);
+			break;
+		}
+	}
+});
+
+getCurrentWindowArrayElement = function () {
+	var currentWindowArrayElement;
+
+	chrome.windows.getLastFocused({populate: true}, function(window){
+		var windowID = window.id;
+	}
+
+	for (var i = 0; i < windowArray.length; i++){
+		if (windowArray[i].id === windowID){
+			currentWindowArrayElement = windowArray[i];
+			break;
+		}
+	}
+};
+
+chrome.tabs.onCreated.addListener(function (tab) {
+	currentWindowArrayElement = getCurrentWindowArrayElement();
+
+	currentWindowArrayElement.openStack.push(tab);
+})
+
+chrome.tabs.onRemoved.addListener(function (tabID) {
+	var currentWindowArrayElement = getCurrentWindowArrayElement();
+	var lastOpenedTab;
+
+	for (var i = 0; i < currentWindowArrayElement.openTabStack.length; i++){
+		if (currentWindowArrayElement.openTabStack[i].id === tabID){
+			lastOpenedTab = currentWindowArrayElement.openTabStack[i];
+			break;
+		}
+	}
+
+	currentWindowArrayElement.closeTabStack.push(lastOpenedTab);
+});
+
+
 s.onopen = function (e) {
 	console.log("Socket opened.");
 };
@@ -57,8 +111,6 @@ s.onmessage = function (e) {
 
 	var json = JSON.parse(e.data);
 	var data = json[1];
-	var lastOpentab;
-	var tabStack = new Array();
 
 	//console.log(parseInt(data.timestamp - lastGestureTimeStamp) / 1000000);
 	if (manager.mode.resting && manager.mode.getModeName() !== "Locked" && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > restLockSeconds){
