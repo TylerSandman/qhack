@@ -8,39 +8,31 @@ var myoID = -1;
 var armUsed;
 
 //Global booleans for the state of the Myo
-chrome.browserAction.setIcon({path : "img/windowsMode_locked.png"});
 chrome.browserAction.setPopup({popup: ""});
 
 //Timestamp of the last unlocked gesture
 var lastGestureTimeStamp = 0;
 
-//How many seconds to wait after a gesture before locking the myo again
-var restLockSeconds = 3;
-
-
 var scrollPx;
-var lockTime;
-var delayTime;
+//How many seconds to wait after a gesture before locking the myo again
+var lockTime = 3;
 var oneScreen;
 var windowArray = new Array();
 
 // Setting page stuff
-  chrome.storage.onChanged.addListener(function(changes, namespace) {
-    for (key in changes) {
-        if (key == "scrollPx") {
-            scrollPx = changes[key];
-        }
-        else if (key == "lockTime") {
-            lockTime = changes[key];
-        }
-        else if (key == "delayTime") {
-            delayTime = changes[key];
-        }
-        else if (key == "oneScreen") {
-            oneScreen = changes[key];
-        }
-    }
-  });
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+	for (key in changes) {
+	    if (key == "scrollPx") {
+	        scrollPx = changes[key];
+	    }
+	    else if (key == "lockTime") {
+	        lockTime = changes[key];
+	    }
+	    else if (key == "oneScreen") {
+	        oneScreen = changes[key];
+	    }
+	}
+});
 console.log("Host:", host);
 
 var s = new WebSocket(host);
@@ -113,7 +105,7 @@ s.onmessage = function (e) {
 	var data = json[1];
 
 	//console.log(parseInt(data.timestamp - lastGestureTimeStamp) / 1000000);
-	if (manager.mode.resting && manager.mode.getModeName() !== "Locked" && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > restLockSeconds){
+	if (manager.mode.resting && manager.mode.getModeName() !== "Locked" && (parseInt(data.timestamp) - lastGestureTimeStamp) / 1000000 > lockTime){
 		console.log("Locking!");
 		manager.changeMode(new LockedBrowserMode(manager));
 		chrome.browserAction.setIcon({path : "img/locked.png"});
@@ -130,7 +122,7 @@ s.onmessage = function (e) {
 	}
 
 	if (data.type === "pose" && myoID != -1){
-		
+
 		if (data.pose === "thumb_to_pinky"){
 			manager.onThumbToPinky(data);
 			if (manager.mode.getModeName() !== "Locked"){
@@ -138,8 +130,6 @@ s.onmessage = function (e) {
 			}
 			requestVibrate();
 		}
-		
-			
 
 		else if (manager.mode.getModeName() !== "Locked"){
 			lastGestureTimeStamp = parseInt(data.timestamp);
@@ -164,10 +154,10 @@ s.onmessage = function (e) {
 			else if (data.pose === "fingers_spread")
 				manager.onFingersSpread(data);
 		}
-		
+
 		else if (data.pose === "rest"){
 			manager.onRest(data);
-		}	
+		}
 	}
 
 	if (data.type === "connected"){
