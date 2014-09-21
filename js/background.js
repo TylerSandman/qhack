@@ -8,7 +8,8 @@ var myoID = -1;
 
 //Global booleans for the state of the Myo
 var unlocked = false;
-chrome.browserAction.setIcon({path : "img/locked.png"});
+chrome.browserAction.setIcon({path : "img/windowsMode_locked.png"});
+chrome.browserAction.setPopup({popup: ""});
 var resting = true;
 
 //Timestamp of the last unlocked gesture
